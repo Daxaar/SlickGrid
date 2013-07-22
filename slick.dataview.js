@@ -113,7 +113,7 @@
       for (var i = 0, l = items.length; i < l; i++) {
         id = items[i][idProperty];
         if (id === undefined || idxById[id] !== i) {
-          throw "Each data element must implement a unique 'id' property";
+          throw "Each data element must implement a unique 'id' property. Found non-unique id: "+id;
         }
       }
     }
