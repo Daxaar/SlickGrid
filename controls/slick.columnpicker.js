@@ -4,7 +4,9 @@
     var columnCheckboxes;
 
     var defaults = {
-      fadeSpeed:250
+      fadeSpeed:250,
+      selSortButtons:false,
+      uiButtons:false
     };
 
     function init() {
@@ -26,10 +28,35 @@
       $menu.empty();
       updateColumnOrder();
       columnCheckboxes = [];
+      // Buttons to select/unselect all checkboxes and to sort the column list.
+      if (options.selSortButtons) {
+        $("<button>Select all</button>")
+          .bind('click', function() {
+            $('input', 'ul').prop('checked', true);
+           })
+          .appendTo($menu);
+        $("<button>Unselect all</button>")
+          .bind('click', function() {
+            $('input', 'ul').prop('checked', false);
+           })
+          .appendTo($menu);
+        $("<button>Sort</button>")
+          .bind('click', function() {
+            $('.slick-columnpicker ul')
+              .children('li')
+              .sort(function(a,b){
+                return a.innerText.toLowerCase() > b.innerText.toLowerCase() ? 1 : -1;
+              })
+              .appendTo($('.slick-columnpicker ul'));
+           })
+          .appendTo($menu);
+        $("<hr />").appendTo($menu);
+      }
 
       var $li, $input;
+      var $ul = $("<ul style='margin:0;padding-left:0;' />").appendTo($menu);
       for (var i = 0; i < columns.length; i++) {
-        $li = $("<li />").appendTo($menu);
+        $li = $("<li />").appendTo($ul);
         $input = $("<input type='checkbox' />").data("column-id", columns[i].id);
         columnCheckboxes.push($input);
 
@@ -44,7 +71,7 @@
       }
 
       $("<hr/>").appendTo($menu);
-      $li = $("<li />").appendTo($menu);
+      $li = $("<span />").appendTo($menu);
       $input = $("<input type='checkbox' />").data("option", "autoresize");
       $("<label />")
           .text("Force fit columns")
@@ -54,7 +81,8 @@
         $input.attr("checked", "checked");
       }
 
-      $li = $("<li />").appendTo($menu);
+      $("<br/>").appendTo($menu);
+      $li = $("<span />").appendTo($menu);
       $input = $("<input type='checkbox' />").data("option", "syncresize");
       $("<label />")
           .text("Synchronous resize")
@@ -68,6 +96,22 @@
           .css("top", e.pageY - 10)
           .css("left", e.pageX - 10)
           .fadeIn(options.fadeSpeed);
+      // Apply jQuery UI button styling.
+      if (options.selSortButtons & options.uiButtons) {
+        $( ".slick-columnpicker button:first" ).button({
+          icons: {
+            primary: "ui-icon-check"
+          }
+        }).next().button({
+          icons: {
+            primary: "ui-icon-minusthick"
+          }
+        }).next().button({
+          icons: {
+            primary: "ui-icon-arrowthick-2-n-s"
+          }
+        });
+      }
     }
 
     function updateColumnOrder() {
