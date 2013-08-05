@@ -838,7 +838,7 @@
       }
     }
 
-    function syncGridSelection(grid, preserveHidden) {
+    function syncGridSelection(grid, preserveHidden, preserveOnFilter) {
       var self = this;
       var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());;
       var inHandler;
@@ -847,7 +847,7 @@
         if (selectedRowIds.length > 0) {
           inHandler = true;
           var selectedRows = self.mapIdsToRows(selectedRowIds);
-          if (!preserveHidden) {
+          if (!preserveHidden && !preserveOnFilter) {
             selectedRowIds = self.mapRowsToIds(selectedRows);
           }
           grid.setSelectedRows(selectedRows);
@@ -857,7 +857,18 @@
 
       grid.onSelectedRowsChanged.subscribe(function(e, args) {
         if (inHandler) { return; }
-        selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
+        if (preserveOnFilter) {
+          var keepIds = [];
+          // Keep any ids that were previously selected but do not
+          // appear in the current view of the grid.
+          $.each(selectedRowIds, function(i,id) {
+            if (self.getRowById(id) === undefined) { keepIds.push(id); }
+          });
+          selectedRowIds = keepIds.concat(self.mapRowsToIds(grid.getSelectedRows()));
+        }
+        else {
+          selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
+        }
       });
 
       this.onRowsChanged.subscribe(update);
