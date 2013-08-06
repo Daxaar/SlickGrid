@@ -16,7 +16,7 @@
 </head>
 <body>
 <div style="position:relative">
-  <div style="width:600px;">
+  <div style="width:630px;">
     <div id="myGrid" style="width:100%;height:500px;"></div>
   </div>
 
@@ -24,7 +24,7 @@
     <h2>Demonstrates:</h2>
     <ul>
       <li>Checkbox row select column</li>
-      <li><label>And col A including:</label>
+      <li><label>Search for column A including:</label>
       <input type=text id="txtSearch" style="width:100px;"></li>
     </ul>
     <button id="btnSelected">Log the currently selected ids</button>
@@ -64,6 +64,7 @@
   };
   var columns = [];
   var searchString = "";
+  var selectedIds = [];
 
   function myFilter(item) {
     if (searchString != "" && item[0].indexOf(searchString) == -1) {
@@ -107,7 +108,7 @@
     grid = new Slick.Grid("#myGrid", dataView, columns, options);
     grid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: false}));
     grid.registerPlugin(checkboxSelector);
-    dataView.syncGridSelection(grid, true, true);
+    dataView.syncGridSelection(grid, true, true, function(syncedIds) { selectedIds = syncedIds; });
     
     // wire up model events to drive the grid
     dataView.onRowCountChanged.subscribe(function (e, args) {
@@ -126,11 +127,11 @@
     $("#btnSelected").click(function () {
       var sel = grid.getSelectedRows();
       if (sel.length === 0) {
-        $('<span>Nothing selected.</span><hr>').appendTo('#log');
+        $('<span>Nothing selected (Tracking ids:'+selectedIds.join(', ')+').</span><hr>').appendTo('#log');
       }
       else {
         var ids = $.map(sel, function(e,i) {return grid.getDataItem(e).id; });
-        $('<span>Selected ids: '+ids.join(', ')+'</span><hr>').appendTo('#log');
+        $('<span>Selected ids: '+ids.join(', ')+' (Tracking ids:'+selectedIds.join(', ')+')</span><hr>').appendTo('#log');
       }
     });
 
