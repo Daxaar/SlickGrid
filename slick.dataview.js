@@ -838,7 +838,7 @@
       }
     }
 
-    function syncGridSelection(grid, preserveHidden, preserveOnFilter) {
+    function syncGridSelection(grid, preserveHidden, preserveOnFilter, selChangeCallback) {
       var self = this;
       var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());;
       var inHandler;
@@ -869,6 +869,7 @@
         else {
           selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
         }
+        if (selChangeCallback) { selChangeCallback(selectedRowIds); }
       });
 
       this.onRowsChanged.subscribe(update);
